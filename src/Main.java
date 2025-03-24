@@ -37,8 +37,13 @@ public class Main {
         task2.setStatus(Status.DONE);
 
         subtask1.setStatus(Status.DONE);
+        taskManager.updateSubtask(subtask1);
+
         subtask2.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubtask(subtask2);
+
         subtask3.setStatus(Status.DONE);
+        taskManager.updateSubtask(subtask3);
 
         System.out.println("\nAll Tasks After Status Change:");
         for (Task task : taskManager.getAllTasks()) {
