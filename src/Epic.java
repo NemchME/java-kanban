@@ -20,6 +20,10 @@ public class Epic extends Task {
     }
 
     @Override
+    public void setStatus(Status status) {
+    }
+
+    @Override
     public String toString() {
         return "Epic{" +
                 "name='" + name + '\'' +

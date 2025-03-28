@@ -16,7 +16,11 @@ public class TaskManager {
     }
 
     public Task getTaskById(int id) {
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        if (task == null) {
+            System.out.println("Задача с id=" + id + " не найдена.");
+        }
+        return task;
     }
 
     public Task createTask(Task task) {
@@ -28,11 +32,15 @@ public class TaskManager {
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
+        } else {
+            System.out.println("Не удалось обновить задачу с id=" + task.getId() + ". Задача не найдена.");
         }
     }
 
     public void deleteTaskById(int id) {
-        tasks.remove(id);
+        if (tasks.remove(id) == null) {
+            System.out.println("Не удалось удалить задачу с id=" + id + ". Задача не найдена.");
+        }
     }
 
     public ArrayList<Epic> getAllEpics() {
@@ -45,7 +53,11 @@ public class TaskManager {
     }
 
     public Epic getEpicById(int id) {
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        if (epic == null) {
+            System.out.println("Эпик с id=" + id + " не найден.");
+        }
+        return epic;
     }
 
     public Epic createEpic(Epic epic) {
@@ -59,6 +71,8 @@ public class TaskManager {
         if (savedEpic != null) {
             savedEpic.setName(epic.getName());
             savedEpic.setDescription(epic.getDescription());
+        } else {
+            System.out.println("Не удалось обновить эпик с id=" + epic.getId() + ". Эпик не найден.");
         }
     }
 
@@ -68,6 +82,8 @@ public class TaskManager {
             for (Integer subtaskId : epic.getSubtaskIds()) {
                 subtasks.remove(subtaskId);
             }
+        } else {
+            System.out.println("Не удалось удалить эпик с id=" + id + ". Эпик не найден.");
         }
     }
 
@@ -85,6 +101,8 @@ public class TaskManager {
                     result.add(subtask);
                 }
             }
+        } else {
+            System.out.println("Эпик с id=" + epicId + " не найден. Невозможно получить подзадачи.");
         }
         return result;
     }
@@ -92,6 +110,7 @@ public class TaskManager {
     private void updateEpicStatus(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic == null) {
+            System.out.println("Эпик с id=" + epicId + " не найден. Невозможно обновить статус.");
             return;
         }
 
@@ -131,7 +150,11 @@ public class TaskManager {
     }
 
     public Subtask getSubtaskById(int id) {
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        if (subtask == null) {
+            System.out.println("Подзадача с id=" + id + " не найдена.");
+        }
+        return subtask;
     }
 
     public Subtask createSubtask(Subtask subtask) {
@@ -141,8 +164,10 @@ public class TaskManager {
             epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
             updateEpicStatus(subtask.getEpicId());
             return subtask;
+        } else {
+            System.out.println("Не удалось создать подзадачу. Эпик с id=" + subtask.getEpicId() + " не найден.");
+            return null;
         }
-        return null;
     }
 
     public void updateSubtask(Subtask subtask) {
@@ -150,6 +175,9 @@ public class TaskManager {
                 epics.containsKey(subtask.getEpicId())) {
             subtasks.put(subtask.getId(), subtask);
             updateEpicStatus(subtask.getEpicId());
+        } else {
+            System.out.println("Не удалось обновить подзадачу с id=" + subtask.getId() +
+                    ". Подзадача или эпик не найдены.");
         }
     }
 
@@ -161,6 +189,8 @@ public class TaskManager {
                 epic.removeSubtaskId(id);
                 updateEpicStatus(epic.getId());
             }
+        } else {
+            System.out.println("Не удалось удалить подзадачу с id=" + id + ". Подзадача не найдена.");
         }
     }
 }
