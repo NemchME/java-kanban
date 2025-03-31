@@ -188,7 +188,7 @@ public class InMemoryTaskManager implements TaskManager {
     private void addToHistory(Task task) {
         history.add(task);
         if (history.size() > MAX_HISTORY_SIZE) {
-            history.remove(0);
+            history.removeFirst();
         }
     }
 
