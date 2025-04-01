@@ -1,5 +1,10 @@
+package tests;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import taskManager.InMemoryHistoryManager;
+import tasks.Status;
+import tasks.Task;
 
 import java.util.ArrayList;
 
@@ -12,9 +17,9 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     void setUp() {
         manager = new InMemoryHistoryManager();
-        task1 = new Task("Task 1", "Description 1", Status.NEW);
-        task2 = new Task("Task 2", "Description 2", Status.IN_PROGRESS);
-        task3 = new Task("Task 3", "Description 3", Status.DONE);
+        task1 = new Task("tasks.Task 1", "Description 1", Status.NEW);
+        task2 = new Task("tasks.Task 2", "Description 2", Status.IN_PROGRESS);
+        task3 = new Task("tasks.Task 3", "Description 3", Status.DONE);
         task1.setId(1);
         task2.setId(2);
         task3.setId(3);
@@ -61,7 +66,7 @@ class InMemoryHistoryManagerTest {
     void testHistorySizeLimit() {
         // Добавляем больше задач, чем максимальный размер истории
         for (int i = 0; i < 15; i++) {
-            Task task = new Task("Task " + i, "Desc " + i, Status.NEW);
+            Task task = new Task("tasks.Task " + i, "Desc " + i, Status.NEW);
             task.setId(i);
             manager.add(task);
         }

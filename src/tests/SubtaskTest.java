@@ -1,5 +1,11 @@
+package tests;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tasks.Status;
+import tasks.Subtask;
+import tasks.Task;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SubtaskTest {
@@ -8,13 +14,13 @@ class SubtaskTest {
 
     @BeforeEach
     void setUp() {
-        subtask = new Subtask("Test Subtask", "Test Description", Status.NEW, testEpicId);
+        subtask = new Subtask("Test tasks.Subtask", "Test Description", Status.NEW, testEpicId);
     }
 
     @Test
     void testSubtaskCreation() {
         assertNotNull(subtask);
-        assertEquals("Test Subtask", subtask.getName());
+        assertEquals("Test tasks.Subtask", subtask.getName());
         assertEquals("Test Description", subtask.getDescription());
         assertEquals(Status.NEW, subtask.getStatus());
         assertEquals(testEpicId, subtask.getEpicId());
@@ -38,7 +44,7 @@ class SubtaskTest {
 
     @Test
     void testSubtaskInheritance() {
-        assertTrue(subtask instanceof Task, "Subtask должен наследоваться от Task");
+        assertTrue(subtask instanceof Task, "tasks.Subtask должен наследоваться от tasks.Task");
     }
 
     @Test

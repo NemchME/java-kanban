@@ -1,3 +1,10 @@
+package taskManager;
+
+import tasks.Epic;
+import tasks.Status;
+import tasks.Subtask;
+import tasks.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -169,6 +176,8 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Ошибка: эпик (ID=" + subtask.getEpicId() + ") не найден");
             return;
         }
+
+
         subtasks.put(subtask.getId(), subtask);
         updateEpicStatus(subtask.getEpicId());
     }
