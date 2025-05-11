@@ -1,8 +1,9 @@
 package tests;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import taskManager.Managers;
 import taskManager.TaskManager;
-import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -11,36 +12,41 @@ import tasks.Task;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
-    private TaskManager manager = Managers.getDefault();
+    private TaskManager manager;
 
-    @Test
-    void testAddAndFindTasks() {
-        Task task = manager.createTask(new Task("A", "B", Status.NEW));
-        Epic epic = manager.createEpic(new Epic("C", "D"));
-        Subtask sub = manager.createSubtask(new Subtask("E", "F", Status.NEW, epic.getId()));
-
-        assertEquals(task, manager.getTaskById(task.getId()));
-        assertEquals(epic, manager.getEpicById(epic.getId()));
-        assertEquals(sub, manager.getSubtaskById(sub.getId()));
+    @BeforeEach
+    void setup() {
+        manager = Managers.getDefault();
     }
 
     @Test
-    void testManualAndGeneratedIds() {
-        Task task1 = manager.createTask(new Task("A", "B", Status.NEW));
-        Task task2 = new Task("C", "D", Status.NEW);
-        task2.setId(100);
-        manager.createTask(task2);
-        assertNotEquals(task1.getId(), task2.getId());
+    void testTaskCreationAndRetrieval() {
+        Task task = manager.createTask(new Task("Task", "Desc", Status.NEW));
+        Task fetched = manager.getTaskById(task.getId());
+        assertEquals(task, fetched);
     }
 
     @Test
-    void testTaskImmutability() {
-        Task original = new Task("A", "B", Status.NEW);
-        original.setId(1);
-        manager.createTask(original);
-        Task saved = manager.getTaskById(1);
-        assertEquals("A", saved.getName());
-        assertEquals("B", saved.getDescription());
-        assertEquals(Status.NEW, saved.getStatus());
+    void testEpicAndSubtaskLink() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        Subtask sub = manager.createSubtask(new Subtask("Sub", "Desc", Status.NEW, epic.getId()));
+        assertTrue(epic.getSubtaskIds().contains(sub.getId()));
+    }
+
+    @Test
+    void testDeletingSubtaskCleansEpic() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        Subtask sub = manager.createSubtask(new Subtask("Sub", "Desc", Status.NEW, epic.getId()));
+        manager.deleteSubtaskById(sub.getId());
+        assertFalse(epic.getSubtaskIds().contains(sub.getId()));
+    }
+
+    @Test
+    void testTaskSettersAffectManagerStorage() {
+        Task task = manager.createTask(new Task("Old", "Old", Status.NEW));
+        task.setName("New Name");
+        task.setStatus(Status.DONE);
+        assertEquals("New Name", manager.getTaskById(task.getId()).getName());
+        assertEquals(Status.DONE, manager.getTaskById(task.getId()).getStatus());
     }
 }

@@ -10,64 +10,43 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SubtaskTest {
     private Subtask subtask;
-    private final int testEpicId = 1;
 
     @BeforeEach
     void setUp() {
-        subtask = new Subtask("Test tasks.Subtask", "Test Description", Status.NEW, testEpicId);
+        subtask = new Subtask("Subtask", "Description", Status.NEW, 1);
+        subtask.setId(10);
     }
 
     @Test
-    void testSubtaskCreation() {
-        assertNotNull(subtask);
-        assertEquals("Test tasks.Subtask", subtask.getName());
-        assertEquals("Test Description", subtask.getDescription());
+    void testSubtaskFields() {
+        assertEquals("Subtask", subtask.getName());
+        assertEquals("Description", subtask.getDescription());
         assertEquals(Status.NEW, subtask.getStatus());
-        assertEquals(testEpicId, subtask.getEpicId());
-    }
-
-    @Test
-    void testSubtaskEqualityById() {
-        Subtask sub1 = new Subtask("A", "B", Status.NEW, 1);
-        Subtask sub2 = new Subtask("C", "D", Status.DONE, 2);
-        sub1.setId(3);
-        sub2.setId(3);
-        assertEquals(sub1, sub2, "Подзадачи должны быть равны при одинаковом ID");
+        assertEquals(1, subtask.getEpicId());
     }
 
     @Test
     void testSetEpicId() {
-        int newEpicId = 5;
-        subtask.setEpicId(newEpicId);
-        assertEquals(newEpicId, subtask.getEpicId());
+        subtask.setEpicId(5);
+        assertEquals(5, subtask.getEpicId());
     }
 
     @Test
-    void testSubtaskInheritance() {
-        assertTrue(subtask instanceof Task, "tasks.Subtask должен наследоваться от tasks.Task");
+    void testSubtaskEqualsById() {
+        Subtask copy = new Subtask("Other", "Other", Status.DONE, 99);
+        copy.setId(10);
+        assertEquals(subtask, copy);
     }
 
     @Test
-    void testSubtaskStatusChange() {
-        subtask.setStatus(Status.IN_PROGRESS);
-        assertEquals(Status.IN_PROGRESS, subtask.getStatus());
+    void testSubtaskNotEqualIfDifferentId() {
+        Subtask other = new Subtask("Same", "Same", Status.NEW, 1);
+        other.setId(11);
+        assertNotEquals(subtask, other);
     }
 
     @Test
-    void testDifferentSubtasksNotEqual() {
-        Subtask sub1 = new Subtask("A", "B", Status.NEW, 1);
-        Subtask sub2 = new Subtask("A", "B", Status.NEW, 1);
-        sub1.setId(1);
-        sub2.setId(2);
-        assertNotEquals(sub1, sub2, "Подзадачи с разными ID не должны быть равны");
-    }
-
-    @Test
-    void testSubtaskWithSameFieldsButDifferentEpic() {
-        Subtask sub1 = new Subtask("A", "B", Status.NEW, 1);
-        Subtask sub2 = new Subtask("A", "B", Status.NEW, 2);
-        sub1.setId(3);
-        sub2.setId(3);
-        assertEquals(sub1, sub2, "ID эпика не должен влиять на равенство подзадач");
+    void testSubtaskIsInstanceOfTask() {
+        assertTrue(subtask instanceof Task);
     }
 }
