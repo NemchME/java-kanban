@@ -62,7 +62,7 @@ public class Main {
         printAllTasks(manager);
         System.out.println("\n=== История перед удалением эпика ===");
         printHistory(manager.getHistory());
-        
+
         manager.deleteEpicById(epic1.getId());
 
         System.out.println("\n=== Состояние после удаления эпика ===");
