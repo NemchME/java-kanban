@@ -26,6 +26,9 @@ public class Main {
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
 
+        Epic epicWithoutSubtasks = new Epic("Пустой эпик", "Эпик без подзадач");
+        manager.createEpic(epicWithoutSubtasks);
+
         System.out.println("=== Первоначальное состояние ===");
         printAllTasks(manager);
 
@@ -35,6 +38,10 @@ public class Main {
         manager.getTaskById(task1.getId());
         manager.getEpicById(epic1.getId());
         manager.getSubtaskById(subtask1.getId());
+        manager.getTaskById(task2.getId());
+        manager.getEpicById(epicWithoutSubtasks.getId());
+        manager.getTaskById(task1.getId());
+        manager.getSubtaskById(subtask2.getId());
 
         System.out.println("\n=== История после просмотра задач ===");
         printHistory(manager.getHistory());
@@ -47,10 +54,26 @@ public class Main {
 
         manager.deleteTaskById(task2.getId());
 
-        System.out.println("\n=== Состояние после изменений ===");
+        Subtask subtask3 = new Subtask("Распаковать вещи", "Распаковать на новом месте",
+                Status.NEW, epic1.getId());
+        manager.createSubtask(subtask3);
+
+        System.out.println("\n=== Состояние перед удалением эпика ===");
+        printAllTasks(manager);
+        System.out.println("\n=== История перед удалением эпика ===");
+        printHistory(manager.getHistory());
+        
+        manager.deleteEpicById(epic1.getId());
+
+        System.out.println("\n=== Состояние после удаления эпика ===");
+        printAllTasks(manager);
+        System.out.println("\n=== История после удаления эпика ===");
+        printHistory(manager.getHistory());
+
+        System.out.println("\n=== Состояние после всех изменений ===");
         printAllTasks(manager);
 
-        System.out.println("\n=== История просмотров после изменений ===");
+        System.out.println("\n=== История просмотров после всех изменений ===");
         printHistory(manager.getHistory());
     }
 

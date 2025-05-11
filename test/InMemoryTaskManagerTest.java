@@ -7,6 +7,8 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
@@ -46,5 +48,28 @@ class InMemoryTaskManagerTest {
         task.setStatus(Status.DONE);
         assertEquals("New Name", manager.getTaskById(task.getId()).getName());
         assertEquals(Status.DONE, manager.getTaskById(task.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicDeletionRemovesSubtasksAndHistory() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        Subtask sub = manager.createSubtask(new Subtask("Sub", "Desc", Status.NEW, epic.getId()));
+
+        manager.getEpicById(epic.getId());
+        manager.getSubtaskById(sub.getId());
+
+        manager.deleteEpicById(epic.getId());
+
+        assertNull(manager.getEpicById(epic.getId()));
+        assertNull(manager.getSubtaskById(sub.getId()));
+        assertFalse(manager.getHistory().contains(epic));
+        assertFalse(manager.getHistory().contains(sub));
+    }
+
+    @Test
+    void testGetUnknownIdDoesNotAffectHistory() {
+        List<Task> initialHistory = manager.getHistory();
+        assertNull(manager.getTaskById(999));
+        assertEquals(initialHistory, manager.getHistory());
     }
 }

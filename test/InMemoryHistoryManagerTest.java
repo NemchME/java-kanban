@@ -47,7 +47,7 @@ class InMemoryHistoryManagerTest {
     void testPreventDuplicateInHistory() {
         manager.add(task1);
         manager.add(task2);
-        manager.add(task1);  // должен переместиться в конец
+        manager.add(task1);
         ArrayList<Task> history = manager.getHistory();
         assertEquals(2, history.size());
         assertEquals(task2, history.get(0));
@@ -73,5 +73,24 @@ class InMemoryHistoryManagerTest {
         manager.add(task1);
         task1.setStatus(Status.DONE);
         assertEquals(Status.DONE, manager.getHistory().get(0).getStatus());
+    }
+
+    @Test
+    void testRemoveNonExistentTaskDoesNothing() {
+        manager.add(task1);
+        manager.remove(999);
+        assertEquals(1, manager.getHistory().size());
+    }
+
+    @Test
+    void testHistoryOrderAfterMultipleOperations() {
+        manager.add(task1);
+        manager.add(task2);
+        manager.add(task1);
+        manager.remove(task2.getId());
+
+        ArrayList<Task> history = manager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task1, history.get(0));
     }
 }
