@@ -1,12 +1,11 @@
-package tests;
-
-import taskManager.Managers;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import taskmanager.Managers;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManagersTest {
     @Test
-    void testManagersInitialization() {
+    void testManagerFactories() {
         assertNotNull(Managers.getDefault());
         assertNotNull(Managers.getDefaultHistory());
     }
