@@ -16,6 +16,60 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
+    public static void main(String[] args) {
+        File file = new File("task_manager_data.csv");
+
+        try {
+            FileBackedTaskManager manager1 = new FileBackedTaskManager(file);
+
+            Task task1 = new Task("Task1", "Task1 desc", Status.NEW);
+            Task task2 = new Task("Task2", "Task2 desc", Status.NEW);
+            manager1.createTask(task1);
+            manager1.createTask(task2);
+
+            Epic epic1 = new Epic("Epic1", "Epic1 desc");
+            Epic epic2 = new Epic("Epic2", "Epic2 desc");
+            manager1.createEpic(epic1);
+            manager1.createEpic(epic2);
+
+            Subtask subtask1 = new Subtask("Subtask1", "Subtask1 desc", Status.NEW, epic1.getId());
+            Subtask subtask2 = new Subtask("Subtask2", "Subtask2 desc", Status.NEW, epic1.getId());
+            Subtask subtask3 = new Subtask("Subtask3", "Subtask3 desc", Status.NEW, epic2.getId());
+            Subtask subtask4 = new Subtask("Subtask4", "Subtask4 desc", Status.NEW, epic2.getId());
+            manager1.createSubtask(subtask1);
+            manager1.createSubtask(subtask2);
+            manager1.createSubtask(subtask3);
+            manager1.createSubtask(subtask4);
+
+            FileBackedTaskManager manager2 = FileBackedTaskManager.loadFromFile(file);
+
+            System.out.println("Checking tasks:");
+            System.out.println("Manager1 tasks: " + manager1.getAllTasks());
+            System.out.println("Manager2 tasks: " + manager2.getAllTasks());
+            System.out.println("Match: " + manager1.getAllTasks().equals(manager2.getAllTasks()));
+
+            System.out.println("\nChecking epics:");
+            System.out.println("Manager1 epics: " + manager1.getAllEpics());
+            System.out.println("Manager2 epics: " + manager2.getAllEpics());
+            System.out.println("Match: " + manager1.getAllEpics().equals(manager2.getAllEpics()));
+
+            System.out.println("\nChecking subtasks:");
+            System.out.println("Manager1 subtasks: " + manager1.getAllSubtasks());
+            System.out.println("Manager2 subtasks: " + manager2.getAllSubtasks());
+            System.out.println("Match: " + manager1.getAllSubtasks().equals(manager2.getAllSubtasks()));
+
+            System.out.println("\nChecking epic-subtask relationships:");
+            for (Epic epic : manager1.getAllEpics()) {
+                System.out.println("Epic " + epic.getId() + " subtasks in manager1: " +
+                        manager1.getSubtasksByEpicId(epic.getId()));
+                System.out.println("Epic " + epic.getId() + " subtasks in manager2: " +
+                        manager2.getSubtasksByEpicId(epic.getId()));
+            }
+        } finally {
+            file.delete();
+        }
+    }
+
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         manager.load();

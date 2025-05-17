@@ -2,6 +2,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import taskmanager.FileBackedTaskManager;
+import taskmanager.ManagerSaveException;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -54,6 +55,16 @@ class FileBackedTaskManagerTest {
         assertEquals("Task1", tasks.get(0).getName());
         assertEquals("Epic1", epics.get(0).getName());
         assertEquals("Subtask1", subtasks.get(0).getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWheInvalidFileData() {
+        try {
+            //invalid file path
+            new FileBackedTaskManager(new File("?"));
+        } catch (Exception ex) {
+            assertEquals(ex.getClass(), ManagerSaveException.class);
+        }
     }
 
     @Test
