@@ -7,6 +7,8 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,5 +73,51 @@ class InMemoryTaskManagerTest {
         List<Task> initialHistory = manager.getHistory();
         assertNull(manager.getTaskById(999));
         assertEquals(initialHistory, manager.getHistory());
+    }
+
+    @Test
+    void testTaskTimeOverlap() {
+        Task task1 = new Task("Task1", "Desc", Status.NEW);
+        task1.setStartTime(LocalDateTime.of(2025, 6, 10, 12, 0));
+        task1.setDuration(Duration.ofMinutes(60));
+        manager.createTask(task1);
+
+        Task task2 = new Task("Task2", "Desc", Status.NEW);
+        task2.setStartTime(LocalDateTime.of(2025, 6, 10, 12, 30));
+        task2.setDuration(Duration.ofMinutes(60));
+
+        assertNull(manager.createTask(task2), "Should reject overlapping task");
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllNew() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.NEW, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.NEW, epic.getId()));
+        assertEquals(Status.NEW, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllDone() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.DONE, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.DONE, epic.getId()));
+        assertEquals(Status.DONE, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_Mixed() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.NEW, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.DONE, epic.getId()));
+        assertEquals(Status.IN_PROGRESS, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllInProgress() {
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.IN_PROGRESS, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.IN_PROGRESS, epic.getId()));
+        assertEquals(Status.IN_PROGRESS, manager.getEpicById(epic.getId()).getStatus());
     }
 }

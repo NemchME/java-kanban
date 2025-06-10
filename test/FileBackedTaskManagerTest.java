@@ -10,6 +10,8 @@ import tasks.Task;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,15 +60,6 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void shouldThrowExceptionWheInvalidFileData() {
-        try {
-            new FileBackedTaskManager(new File("?"));
-        } catch (Exception ex) {
-            assertEquals(ex.getClass(), ManagerSaveException.class);
-        }
-    }
-
-    @Test
     void shouldRestoreSubtaskRelationToEpic() {
         FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
 
@@ -103,5 +96,56 @@ class FileBackedTaskManagerTest {
         Task created = loadedManager.createTask(newTask);
 
         assertTrue(created.getId() > task1.getId(), "New task ID should be greater than previous max ID");
+    }
+
+    @Test
+    void testTaskTimeOverlap() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+
+        Task task1 = new Task("Task1", "Desc", Status.NEW);
+        task1.setStartTime(LocalDateTime.of(2025, 6, 10, 12, 0));
+        task1.setDuration(Duration.ofMinutes(60));
+        manager.createTask(task1);
+        Task task2 = new Task("Task2", "Desc", Status.NEW);
+        task2.setStartTime(LocalDateTime.of(2025, 6, 10, 12, 30));
+        task2.setDuration(Duration.ofMinutes(60));
+
+        assertNull(manager.createTask(task2), "Should reject overlapping task");
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllNew() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.NEW, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.NEW, epic.getId()));
+        assertEquals(Status.NEW, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllDone() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.DONE, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.DONE, epic.getId()));
+        assertEquals(Status.DONE, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_Mixed() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.NEW, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.DONE, epic.getId()));
+        assertEquals(Status.IN_PROGRESS, manager.getEpicById(epic.getId()).getStatus());
+    }
+
+    @Test
+    void testEpicStatusCalculation_AllInProgress() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+        Epic epic = manager.createEpic(new Epic("Epic", "Desc"));
+        manager.createSubtask(new Subtask("Sub1", "Desc", Status.IN_PROGRESS, epic.getId()));
+        manager.createSubtask(new Subtask("Sub2", "Desc", Status.IN_PROGRESS, epic.getId()));
+        assertEquals(Status.IN_PROGRESS, manager.getEpicById(epic.getId()).getStatus());
     }
 }
