@@ -60,7 +60,6 @@ class FileBackedTaskManagerTest {
     @Test
     void shouldThrowExceptionWheInvalidFileData() {
         try {
-            //invalid file path
             new FileBackedTaskManager(new File("?"));
         } catch (Exception ex) {
             assertEquals(ex.getClass(), ManagerSaveException.class);
