@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task> {
     protected String name;
     protected String description;
     protected int id;
@@ -99,5 +99,19 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Task other) {
+        if (this.startTime == null && other.startTime == null) {
+            return Integer.compare(this.id, other.id);
+        }
+        if (this.startTime == null) return 1;
+        if (other.startTime == null) return -1;
+
+        int cmp = this.startTime.compareTo(other.startTime);
+        if (cmp != 0) return cmp;
+
+        return Integer.compare(this.id, other.id);
     }
 }
