@@ -4,6 +4,7 @@ import tasks.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.Duration;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int taskIdCounter = 1;
@@ -222,13 +223,22 @@ public class InMemoryTaskManager implements TaskManager {
     private void updateEpicStatus(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic == null) return;
+
         List<Subtask> subs = getSubtasksByEpicId(epicId);
         if (subs.isEmpty()) {
             epic.setStatus(Status.NEW);
+            epic.setStartTime(null);
+            epic.setDuration(Duration.ZERO);
+            epic.setEndTime(null);
             return;
         }
+
         boolean allNew = subs.stream().allMatch(s -> s.getStatus() == Status.NEW);
         boolean allDone = subs.stream().allMatch(s -> s.getStatus() == Status.DONE);
         epic.setStatus(allDone ? Status.DONE : allNew ? Status.NEW : Status.IN_PROGRESS);
+
+        epic.setDuration(epic.calculateDuration(this));
+        epic.setStartTime(epic.calculateStartTime(this));
+        epic.setEndTime(epic.calculateEndTime(this));
     }
 }

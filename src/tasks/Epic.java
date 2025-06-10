@@ -1,17 +1,20 @@
 package tasks;
 
-import taskmanager.TaskManager;
-import taskmanager.Managers;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
+import taskmanager.TaskManager;
 
 public class Epic extends Task {
     private final ArrayList<Integer> subtaskIds = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
+        this.duration = Duration.ZERO;
+        this.startTime = null;
+        this.endTime = null;
     }
 
     public ArrayList<Integer> getSubtaskIds() {
@@ -19,7 +22,10 @@ public class Epic extends Task {
     }
 
     public void addSubtaskId(int subtaskId) {
-        if (subtaskId == this.id) return;
+        if (subtaskId == this.id) {
+            System.out.println("Эпик не может являться подзадачей самого себя.");
+            return;
+        }
         subtaskIds.add(subtaskId);
     }
 
@@ -27,50 +33,47 @@ public class Epic extends Task {
         subtaskIds.remove((Integer) subtaskId);
     }
 
-    @Override
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    @Override
-    public Duration getDuration() {
-        Duration total = Duration.ZERO;
-        TaskManager tm = Managers.getDefault();
-        for (int id : subtaskIds) {
-            Task t = tm.getSubtaskById(id);
-            if (t != null && t.getDuration() != null) total = total.plus(t.getDuration());
-        }
-        return total;
-    }
-
-    @Override
-    public LocalDateTime getStartTime() {
-        LocalDateTime earliest = null;
-        TaskManager tm = Managers.getDefault();
-        for (int id : subtaskIds) {
-            Task t = tm.getSubtaskById(id);
-            if (t != null && t.getStartTime() != null) {
-                if (earliest == null || t.getStartTime().isBefore(earliest)) {
-                    earliest = t.getStartTime();
-                }
-            }
-        }
-        return earliest;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @Override
     public LocalDateTime getEndTime() {
-        LocalDateTime latest = null;
-        TaskManager tm = Managers.getDefault();
-        for (int id : subtaskIds) {
-            Task t = tm.getSubtaskById(id);
-            if (t != null && t.getEndTime() != null) {
-                if (latest == null || t.getEndTime().isAfter(latest)) {
-                    latest = t.getEndTime();
-                }
-            }
-        }
-        return latest;
+        return endTime;
+    }
+
+    public Duration calculateDuration(TaskManager manager) {
+        return subtaskIds.stream()
+                .map(manager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Task::getDuration)
+                .filter(Objects::nonNull)
+                .reduce(Duration.ZERO, Duration::plus);
+    }
+
+    public LocalDateTime calculateStartTime(TaskManager manager) {
+        return subtaskIds.stream()
+                .map(manager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Task::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+
+    public LocalDateTime calculateEndTime(TaskManager manager) {
+        return subtaskIds.stream()
+                .map(manager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Task::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override
@@ -81,6 +84,9 @@ public class Epic extends Task {
                 ", id=" + id +
                 ", status=" + status +
                 ", subtaskIds=" + subtaskIds +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
+                ", endTime=" + endTime +
                 '}';
     }
 }
