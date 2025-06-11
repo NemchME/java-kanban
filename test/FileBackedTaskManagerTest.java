@@ -1,7 +1,9 @@
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import taskmanager.FileBackedTaskManager;
+import taskmanager.ManagerSaveException;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -29,6 +31,20 @@ class FileBackedTaskManagerTest {
         if (tempFile.exists()) {
             tempFile.delete();
         }
+    }
+
+    @Test
+    void shouldThrowWhenLoadFromConstructor() {
+        FileBackedTaskManager manager = new FileBackedTaskManager(new File(""));
+
+        Task task = new Task("Task1", "Description1", Status.NEW);
+
+        Assertions.assertThrows(ManagerSaveException.class, () -> manager.createTask(task));
+    }
+
+    @Test
+    void shouldThrowWhenLoadFromFile() {
+        Assertions.assertThrows(ManagerSaveException.class, () -> FileBackedTaskManager.loadFromFile(new File("")));
     }
 
     @Test
