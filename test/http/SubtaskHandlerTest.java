@@ -71,7 +71,8 @@ public class SubtaskHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Subtask> subtasks = gson.fromJson(response.body(), new TypeToken<List<Subtask>>(){}.getType());
+        List<Subtask> subtasks = gson.fromJson(response.body(), new TypeToken<List<Subtask>>() {
+        }.getType());
         assertTrue(subtasks.isEmpty());
     }
 
@@ -120,7 +121,8 @@ public class SubtaskHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Subtask> subtasks = gson.fromJson(response.body(), new TypeToken<List<Subtask>>(){}.getType());
+        List<Subtask> subtasks = gson.fromJson(response.body(), new TypeToken<List<Subtask>>() {
+        }.getType());
         assertEquals(2, subtasks.size());
     }
 

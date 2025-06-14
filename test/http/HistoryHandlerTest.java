@@ -70,7 +70,8 @@ public class HistoryHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>(){}.getType());
+        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>() {
+        }.getType());
         assertTrue(history.isEmpty());
     }
 
@@ -90,7 +91,8 @@ public class HistoryHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>(){}.getType());
+        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>() {
+        }.getType());
         assertEquals(2, history.size());
     }
 
@@ -130,7 +132,8 @@ public class HistoryHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>(){}.getType());
+        List<Task> history = gson.fromJson(response.body(), new TypeToken<List<Task>>() {
+        }.getType());
         assertEquals(1, history.size());
         assertNotNull(history.get(0).getStartTime());
         assertEquals(Duration.ofHours(1), history.get(0).getDuration());

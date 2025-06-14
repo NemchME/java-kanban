@@ -68,7 +68,8 @@ public class EpicHandlerTest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        List<Epic> epics = gson.fromJson(response.body(), new TypeToken<List<Epic>>(){}.getType());
+        List<Epic> epics = gson.fromJson(response.body(), new TypeToken<List<Epic>>() {
+        }.getType());
         assertTrue(epics.isEmpty());
     }
 

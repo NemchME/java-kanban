@@ -19,10 +19,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     public TasksHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new TimeAdapterForGson())
-                .registerTypeAdapter(Duration.class, new DurationAdapterForGson())
-                .create();
+        this.gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new TimeAdapterForGson()).registerTypeAdapter(Duration.class, new DurationAdapterForGson()).create();
     }
 
     private void throwableHandler(HttpExchange exchange) throws IOException {

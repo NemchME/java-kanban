@@ -1,4 +1,5 @@
 package taskmanager.http;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
@@ -31,7 +32,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
         switch (exchange.getRequestMethod()) {
             case "GET" -> {
-                if(pathParts.length == 2) {
+                if (pathParts.length == 2) {
                     String response = this.gson.toJson(taskManager.getAllEpics());
                     sendSuccess(exchange, response);
                 } else {
