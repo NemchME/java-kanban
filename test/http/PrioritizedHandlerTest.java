@@ -1,0 +1,95 @@
+package http;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import taskmanager.InMemoryTaskManager;
+import taskmanager.TaskManager;
+import taskmanager.http.HttpTaskServer;
+import taskmanager.misc.DurationAdapterForGson;
+import taskmanager.misc.TimeAdapterForGson;
+import tasks.Status;
+import tasks.Task;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class PrioritizedHandlerTest {
+    private static HttpTaskServer server;
+    private static TaskManager taskManager;
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, new TimeAdapterForGson())
+            .registerTypeAdapter(Duration.class, new DurationAdapterForGson())
+            .create();
+    private static final String PRIORITIZED_URL = "http://localhost:8080/prioritized";
+
+    @BeforeAll
+    static void initServer() {
+        try {
+            taskManager = new InMemoryTaskManager();
+            server = new HttpTaskServer(taskManager);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        server.start();
+    }
+
+    @AfterAll
+    static void destroyServer() {
+        server.stop();
+    }
+
+    @BeforeEach
+    void resetManager() {
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllEpics();
+    }
+
+    @Test
+    void testGetEmptyPrioritizedTasks() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(PRIORITIZED_URL))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+        List<Task> tasks = gson.fromJson(response.body(), new TypeToken<List<Task>>() {
+        }.getType());
+        assertTrue(tasks.isEmpty());
+    }
+
+    @Test
+    void testUnsupportedMethods() throws IOException, InterruptedException {
+        HttpRequest postRequest = HttpRequest.newBuilder()
+                .uri(URI.create(PRIORITIZED_URL))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> postResponse = httpClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_NOT_FOUND, postResponse.statusCode());
+
+        HttpRequest deleteRequest = HttpRequest.newBuilder()
+                .uri(URI.create(PRIORITIZED_URL))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> deleteResponse = httpClient.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_NOT_FOUND, deleteResponse.statusCode());
+    }
+}
