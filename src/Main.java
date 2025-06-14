@@ -1,5 +1,6 @@
 import taskmanager.InMemoryTaskManager;
 import taskmanager.TaskManager;
+import taskmanager.http.HttpTaskServer;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -11,6 +12,16 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        if (true) {
+            try {
+                HttpTaskServer server = new HttpTaskServer();
+                server.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return;
+        }
         TaskManager manager = new InMemoryTaskManager();
 
         Task task1 = new Task("Помыть посуду", "Помыть всю посуду вечером", Status.NEW);
